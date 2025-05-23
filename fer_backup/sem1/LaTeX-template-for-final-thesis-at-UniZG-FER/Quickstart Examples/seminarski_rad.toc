@@ -1,0 +1,14 @@
+\babel@toc {croatian}{}\relax 
+\babel@toc {croatian}{}\relax 
+\babel@toc {croatian}{}\relax 
+\babel@toc {croatian}{}\relax 
+\contentsline {chapter}{Sa\v {z}etak}{1}{Doc-Start}%
+\babel@toc {croatian}{}\relax 
+\babel@toc {croatian}{}\relax 
+\babel@toc {croatian}{}\relax 
+\contentsline {chapter}{\numberline {1.}Uvod u WebAssembly}{3}{chapter.1}%
+\contentsline {chapter}{\numberline {2.}Primjena u stvarnom svijetu}{5}{chapter.2}%
+\contentsline {chapter}{\numberline {3.}Analiza performansi}{6}{chapter.3}%
+\contentsline {chapter}{\numberline {4.}Sigurnosna razmatranja}{8}{chapter.4}%
+\contentsline {chapter}{\numberline {5.}Zaključak}{10}{chapter.5}%
+\contentsline {chapter}{Literatura}{11}{chapter*.2}%

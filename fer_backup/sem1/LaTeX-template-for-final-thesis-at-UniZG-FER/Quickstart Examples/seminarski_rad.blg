@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: seminarski_rad.aux
+The style file: fer_IEEEtran_HR.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 150 items from 100.
+Database file #1: literatura.bib
+You've used 1 entry,
+            4225 wiz_defined-function locations,
+            847 strings with 8069 characters,
+and the built_in function-call counts, 1193 in all, are:
+= -- 82
+> -- 23
+< -- 11
++ -- 14
+- -- 3
+* -- 71
+:= -- 175
+add.period$ -- 4
+call.type$ -- 1
+change.case$ -- 1
+chr.to.int$ -- 30
+cite$ -- 1
+duplicate$ -- 74
+empty$ -- 96
+format.name$ -- 4
+if$ -- 265
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 12
+newline$ -- 32
+num.names$ -- 1
+pop$ -- 31
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 77
+stack$ -- 0
+substring$ -- 71
+swap$ -- 65
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 1
+warning$ -- 0
+while$ -- 5
+width$ -- 2
+write$ -- 38
