@@ -1,0 +1,251 @@
+This website utilizes technologies such as cookies to enable essential site functionality, as well as for analytics, personalization, and targeted advertising. You may change your settings at any time or accept the default settings. You may close this banner to continue with only essential cookies. Privacy Policy
+
+Storage Preferences
+
+Targeted Advertising
+Personalization
+Analytics
+Save
+Accept All
+Reject All
+Skip to Main Content
+Browse
+Books
+Conferences
+Courses
+Journals & Magazines
+Standards
+Recently Published
+Popular
+My Settings
+Alerts
+My Research Projects
+My Favorites
+Remote Access
+MyXplore
+App
+Preferences
+Purchase History
+Search History
+What can I access?
+Help
+Contact Us
+Resources and Help
+More Sites
+IEEE.ORG
+IEEE XPLORE
+IEEE-SA
+IEEE SPECTRUM
+MORE
+Donate
+Cart
+Access provided by:
+University of Zagreb
+Sign Out
+Attention Authors
+ADVANCED SEARCH
+Conferences >2021 36th IEEE/ACM Internatio...
+Empowering Web Applications with WebAssembly: Are We There Yet?
+Publisher: IEEE
+Cite This
+Weihang Wang
+View Document
+17
+Cites in
+Papers
+1379
+Full
+Text Views
+Abstract
+Authors
+Figures
+References
+Citations
+Keywords
+Metrics
+More Like This
+Footnotes
+ Download PDF
+ Download References
+ Request Permissions
+ Save to
+ Alerts
+Abstract:
+WebAssembly is the newest web standard. It defines a compact bytecode format that allows it to be loaded and executed fast. While WebAssembly is generally believed to be ...Show More
+Metadata
+ Contents
+SECTION I.
+Introduction
+
+WebAssembly (abbreviated Wasm) [1] is the newest web standard designed to speed up web applications. It defines a portable and compact bytecode format to serve as a compilation target for other languages such as C, C++, and Rust. Leading companies, such as eBay, Google, and Norton, have recently embraced WebAssembly in a variety of projects (including barcode scanners [2], pattern matching [3], and TensorFlow.js machine learning applications [4]) to improve the speed of services previously developed in JavaScript.
+
+Although WebAssembly is generally believed to be faster than JavaScript, there have been inconsistent findings in practice [5], [6], [7]. For example, eBay developers used WebAssembly to create a barcode scanner, which increased the speed by 50 times over the JavaScript solution [2]. Samsung developers, on the other hand, discovered that when multiplying matrices of specific sizes on the Samsung Internet browser (v7.2.10.12), WebAssembly is slower than JavaScript [8].
+
+Unfortunately, insufficient study has been done to understand WebAssembly’s performance benefit over JavaScript. Existing work on WebAssembly performance measurement either focuses on comparing WebAssembly with native code or is limited to one particular type of application. Haas et al. [1] measured the performance of WebAssembly in comparison to asm.js and native code. Jangda et al. [9] analyzed the performance of WebAssembly vs. native code. Sandhu et al. [10] studied the performance of sparse matrix-vector multiplication in WebAssembly, and Herrera et al. [11] measured the performance of numerical programs using WebAssembly.
+
+This paper focuses on comparing WebAssembly with generic JavaScript using diverse benchmarks with multiple inputs. We investigate how browser engines optimize WebAssembly execution comparing to JavaScript. In particular, WebAssembly runtime differs from JavaScript runtime in two aspects. First, WebAssembly programs are delivered as compiled binaries that can be loaded and decoded faster than JavaScript programs, which have to be parsed and compiled at runtime. Second, unlike JavaScript that uses garbage collection, WebAssembly employs a linear memory model that allocates a large chunk of memory at instantiation. In this paper, we measure their performances to answer two research questions:
+
+RQ1.
+
+Is WebAssembly always faster than JavaScript?
+
+RQ2.
+
+Which is more memory efficient, WebAssembly or JavaScript?
+
+To answer the research questions, we compile 30 widely-used C benchmarks to WebAssembly and JavaScript, and measure their execution time and memory usage on Google Chrome (v79). Our results show that:
+
+for small program input, WebAssembly is faster than JavaScript. However, when the input size is increased, more than half of the WebAssembly programs (56.7%) become slower than JavaScript. This is due to the fact that a lengthier execution with repeating loops results in a more aggressive Just-in-time (JIT) compilation on JavaScript. Chrome’s JIT optimizations, on the other hand, do not significantly enhance WebAssembly speed.
+
+WebAssembly requires substantially more memory than JavaScript in the Chrome browser (v79). This is because of the usage of garbage collection in JavaScript, which dynamically monitors memory allocations to decide when the memory that is no longer in use should be reclaimed. WebAssembly, on the other hand, uses a linear memory model that allocates a big chunk of memory at instantiation and does not reclaim memory automatically.
+
+We hope that our findings and analysis results will help WebAssembly virtual machine developers in improving WebAssembly runtime speed and memory usage.
+
+SECTION II.
+Background
+
+WebAssembly and JavaScript both execute in JavaScript engines. However, the two languages differ significantly in terms of execution model and memory management.
+
+A. Execution Model
+
+JavaScript source code is parsed, optimized, and compiled at runtime. Inside JavaScript engines, JavaScript source code must first be parsed to an abstract syntax tree, which is used to generate bytecode. To speed up JavaScript execution, modern browser engines use Just-in-time (JIT) compilation [12] on the occurrences of frequently executed bytecode to convert it to machine code for direct execution on the hardware.
+
+By contrast, the low-level WebAssembly bytecode does not need to be parsed because it is ready to be compiled into machine code. Moreover, WebAssembly has already gone through the majority of optimizations during compilation. The runtime speed is highly reliant on how well browsers optimize WebAssembly execution.
+
+B. Memory Management
+
+Memory allocation in JavaScript is managed by the garbage collector that automatically monitors memory allocation and identifies when a block of allocated memory is no longer in use and reclaims it. As a result of the automated memory management, JavaScript is relatively memory-efficient. As demonstrated in the experiments (Section IV-B1), the memory required by JavaScript programs remains constant even when dealing with extremely large input.
+
+In contrast to JavaScript’s garbage collection, WebAssembly uses a linear memory model [13]. The linear memory is represented as a contiguous buffer of untyped bytes that both WebAssembly and JavaScript can read and modify. When a WebAssembly module is instantiated, a memory instance is created in order to allocate a chunk of linear memory for the module to use and emulate dynamic memory allocations. If the initial memory is used up, the memory instance will be extended to a larger size. When processing a large amount of data, our experiments show that WebAssembly consumes significantly more memory than JavaScript.
+
+Fig. 1.
+
+Overview.
+
+SECTION III.
+Methodology
+
+Fig. 1 shows the procedure we use to measure the performance of WebAssembly and JavaScript. It has three steps: (1) Transforming Source Code, (2) Compiling C to Wasm/JS, and (3) Collecting Result.
+
+A. Transforming Source Code
+
+In the first step, we preprocess the source code by transforming it and replacing incompatible primitives with compliant implementations. This preprocessing step is needed because the Cheerp [14] compiler, which we use to compile C programs to WebAssembly/JavaScript, does not support all C features that mainstream C compilers (such as GCC) do. We handle these features that aren’t supported, including Exception and Union, that prevent us from compiling the C programs to WebAssembly and JavaScript.
+
+Fig. 2.
+
+Transforming try-catch exception handler.
+
+For example, Cheerp does not support C exceptions properly [15]. In particular, Cheerp eliminates all the catch blocks from the try-catch statements but leaves the associated throw statements in place, resulting in dangling exceptions during runtime. As unhandled exceptions can cause runtime errors, Cheerp provides a workaround solution which forces an abort whenever an exception is thrown through the -fexceptions command line option. In practice, however, if any code uses exceptions for purposes other than throwing errors (for example, using exceptions to jump out of loops), Cheerp will not translate the code correctly, and the source code logic after compilation will be wrong. To resolve unsupported exceptions, we transform the source code to a no-exception version. As shown in Fig. 2, we remove the try-catch statement and replace a throw statement with a variable error (at line 9) that stores whether the exception occurs or not. Statements in the catch block are copied to the error predicate (lines 15-16) which will be executed if the exception occurs.
+
+B. Compiling C to Wasm/JS
+
+After preprocessing, we compile the transformed C programs to WebAssembly and JavaScript using Cheerp. During the compilation, several parameters are used:
+
+Input Size. The value of a program’s input that affects the amount of calculations is referred to as its input size (e.g., the dimensions of a matrix multiplication). In our experiment, we compile 30 C benchmark programs chosen from the PolyBenchC benchmark suite [16] (Section IV-A). For each benchmark, we use five sets of input: Extra Small (XS), Small (S), Medium (M), Large (L), and Extra Large (XL), as specified in PolyBenchC.
+
+Optimization Level. Cheerp provides several optimization levels. We use optimization level -O2 in our experiment since it achieves a good balance between execution time, resulting code size, and compilation time [17].
+
+Stack/Heap Limit. By default, Cheerp-compiled WebAssembly programs have a maximum heap size of 8MB and maximum stack size of 1MB. A program that uses heap/stack in excess of this limit will cause runtime errors. To overcome this limit, we use compiler flags ‘cheerp-linear-heap-size’ and ‘cheerp-linear-stack-size’ to increase the heap/stack size.
+
+TABLE I PolyBenchC benchmark statistics.
+C. Collecting Result
+1) Including Wasm/JS within a Webpage:
+
+To measure the runtime performance in browsers, we create an HTML webpage that includes the compiled WebAssembly/JavaScript program. This webpage is minimal and includes just the JavaScript program or the JavaScript loader (generated for instantiating WebAssembly) using a ‘<script>’ tag to reduce the overhead imposed by other page elements.
+
+2) Measuring Execution Time:
+
+We use the JavaScript timer performance.now() [18] to measure the execution time, which has a precision of up to microseconds. The timer is included in both the generated JavaScript program and the JavaScript loader, and calls to the timer are placed before and after the target program starts and ends. We run each benchmark ten times and calculate the average.
+
+3) Measuring Memory Usage:
+
+We measure memory usage using developer tools, i.e., Chrome DevTools, which contains a heap profiler [19] that shows memory distribution by a page’s JavaScript objects and DOM nodes. The memory usage observed includes overhead caused by other browser components such as page renderer. To reduce the overhead imposed by other tasks, we run just one browser tab at a time that executes a single benchmark.
+
+SECTION IV.
+Evaluation
+
+We measure the performance differences in Google Chrome (v79). The experiments were done on a machine with Intel i7 CPU, 16GB memory, running Ubuntu 18.04.
+
+A. Subject Programs
+
+We compile 30 C benchmarks to WebAssembly/JavaScript and compare their performance differences. Table I lists the 30 C benchmarks. These programs are selected from PolyBenchC (version 4.2.1), which includes compute-intensive programs that we believe may represent some of the use cases for which WebAssembly was designed [20]. For example, it includes programs that perform matrix calculations and graph algorithms which are important kernels for many image processing applications and scientific model simulations.
+
+TABLE II Execution time statistics.
+B. RQ1: Execution Time
+1) Results:
+
+The execution time results are shown in Table II. WebAssembly outperforms JavaScript for most of the benchmarks when using XS or S input (100% and 96.7% for XS and S, respectively). Comparing with JavaScript, WebAssembly achieves a 35.30x average speedup for XS inputs and a 7.67x average speedup for S inputs.
+
+However, when the input size is increased to M, there are 17 benchmarks where WebAssembly becomes slower than JavaScript. For example, ‘Lu’ in WebAssembly was 62.50x and 2.84x faster than JavaScript for XS (N=40) and S (N=120) input, respectively. However, with M input (N=400), it became 2.49x slower. For the other 13 benchmarks, the speed difference between WebAssembly and JavaScript also narrows considerably (3.68x on average). For example, when using XS input, S input, and M input, the WebAssembly version of the ‘3mm’ benchmark is 47.71x, 10.54x, and 1.12x faster than the JavaScript version. When the input is further increased to L or XL, the number of benchmarks where JavaScript outperforms WebAssembly does not increase.
+
+2) JIT Optimization:
+
+To investigate why WebAssembly performs worse than JavaScript when inputs are large, we study the impact of Just-In-Time (JIT) compilation. JavaScript engines in modern browsers use JIT compilation to increase the speed of JavaScript by optimizing frequently executed code (e.g., hot-loops) [21]. It is unclear if JIT can substantially improve WebAssembly speed. To understand this correlation, we compare the execution time with JIT enabled and disabled. Specifically, we use the ‘--no-opt’ flag [22] and ‘--liftoff --no-wasm-tier-up’ flags [23] to disable the JIT optimization (i.e., TurboFan optimizing compiler) for JavaScript and WebAssembly in Chrome.
+
+Fig. 3 shows the performance improvement with JIT, where the y-axis is the ratio of the execution time without JIT to the execution time with JIT. The last two bars are the geometric mean and average. As can be seen, JIT-enabled JavaScript outperforms JIT-disabled JavaScript 38.37 times on average. By contrast, most of the WebAssembly programs have performance improvement ratios close to one, suggesting that there is no substantial difference in performance with and without JIT.
+
+Takeaway 1: JIT optimization in Chrome significantly impacts JavaScript speed but has no discernible effect on WebAssembly speed.
+
+Fig. 3.
+
+Performance improvement by JIT.
+
+TABLE III Average Memory Usage (in KB).
+C. RQ2: Memory Usage
+
+The memory usage statistics are shown in Table III. As can be seen, the memory usage of JavaScript does not change substantially regardless of the input (between 883.5KB and 885.5KB). By contrast, WebAssembly programs consume substantially more memory for larger inputs. On average, WebAssembly programs use ≈36MB of memory with L inputs and ≈144MB of memory with XL inputs. This is due to the fact that WebAssembly does not support garbage collection [24]. When a WebAssembly module was instantiated, a large chunk of linear memory was initialized to simulate memory allocations. If the initial memory is used up, rather than reclaiming memory that is no longer in use, the linear memory is expanded to a larger size. JavaScript, on the other hand, uses garbage collection, which dynamically monitors memory allocations and reclaims unneeded memory.
+
+Takeaway 2: JavaScript is more memory-efficient than WebAssembly due to garbage collection, which WebAssembly presently does not support.
+
+SECTION V.
+Related Work
+
+Our work is closely related to WebAssembly performance measurement. Haas et al. [1] measured the performance of WebAssembly in comparison to asm.js and native code. Jangda et al. [9] analyzed the performance of WebAssembly vs. native code. Sandhu et al. [10] studied the performance of sparse matrix-vector multiplication in WebAssembly, and Herrera et al. [11] measured the performance of numerical programs using WebAssembly. Existing work either focuses on comparing WebAssembly with native code or is limited to one particular type of application. By contrast, our work compares WebAssembly and generic JavaScript using diverse benchmarks with multiple inputs.
+
+There have been prior works on WebAssembly analysis tools, protections, and studies [25], [26], [27], [28], [29], [30], [31], [32], [33], [34], [35], [36], [37], [38], [39]. Wasabi [26] is the first general-purpose framework for dynamically analyzing WebAssembly. Lehmann et al. [27] analyzed how vulnerabilities in memory-unsafe source languages are exploitable in WebAssembly binaries. Swivel [28] is a new compiler framework for hardening WebAssembly against Spectre attacks. Musch et al. [25] studied the prevalence of WebAssembly, and Hilbig et al. [33] analyzed security properties, source languages, and use cases of real-world WebAssembly binaries.
+
+SECTION VI.
+Limitation and Future Work
+
+Our study is potentially subject to several threats, including the representativeness of the benchmarks used and the generalizability of the results. WebAssembly was designed to be utilized in a range of applications such as cryptographic libraries, games, image processing, arithmetic computation, and others [25], [20]. While we believe the benchmarks we used may represent some common WebAssembly use cases, we do not measure large standalone applications such as games in the comparison. Cheerp is unable to build these applications due to the complexity of its source code. We plan to address the incompatibility issues in the future by changing the compiler or rewriting the source code. Another threat concerns the generalization of the performance results. The benchmarks used in the study were evaluated on Google Chrome, one of the most popular web browsers. As a result, the findings of this study do not represent the performance of other popular browsers such as Mozilla Firefox and Microsoft Edge. We plan to compare the performance difference across various browsers in the future.
+
+Our future work includes four directions. First, WebAssembly runtime environments play a critical role in performance. Thus, we plan to study the performance difference on various browsers and platforms. Second, we find that compilers generating WebAssembly programs can impact the runtime performance, especially the optimization techniques applied. Next, we want to investigate the impact of compilers used in generating WebAssembly binaries. Third, our current dataset is limited to simple C benchmarks with a few hundred LOC. We will add complex real-world applications in the experiments. Fourth, we plan to investigate how to optimize WebAssembly runtime to improve its speed and memory efficiency.
+
+ACKNOWLEDGMENTS
+
+We thank the anonymous reviewers for their constructive comments. This research was partially supported by NSF 2047980 and a Mozilla Research Grant (2019). Any opinions, findings, and conclusions in this paper are those of the authors only and do not necessarily reflect the views of our sponsors.
+
+More Like This
+Minimizing impact on JAVA virtual machine via JAVA code optimization
+
+2015 International Conference on Energy Systems and Applications
+
+Published: 2015
+
+Analogous Particle Swarm Optimization for Choosing Optimal Selection of Virtual Machine in Cloud
+
+2022 International Conference on Computer Communication and Informatics (ICCCI)
+
+Published: 2022
+
+Show More
+IEEE Personal Account
+CHANGE USERNAME/PASSWORD
+Purchase Details
+PAYMENT OPTIONS
+VIEW PURCHASED DOCUMENTS
+Profile Information
+COMMUNICATIONS PREFERENCES
+PROFESSION AND EDUCATION
+TECHNICAL INTERESTS
+Need Help?
+US & CANADA: +1 800 678 4333
+WORLDWIDE: +1 732 981 0060
+CONTACT & SUPPORT
+Follow
+
+About IEEE Xplore | Contact Us | Help | Accessibility | Terms of Use | Nondiscrimination Policy | IEEE Ethics Reporting | Sitemap | IEEE Privacy Policy
+
+A public charity, IEEE is the world's largest technical professional organization dedicated to advancing technology for the benefit of humanity.
+
+© Copyright 2025 IEEE - All rights reserved, including rights for text and data mining and training of artificial intelligence and similar technologies.
